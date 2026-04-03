@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart & Checkout</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0d0f1a; --bg2: #131627; --bg3: #1a1d35;
+      --card: rgba(255,255,255,0.04); --card-border: rgba(255,255,255,0.08);
+      --accent: #6c63ff; --accent2: #ff6584; --accent3: #43d9ad; --accent4: #f7c59f;
+      --text: #e8e8f0; --text-dim: #8888aa;
+      --radius: 16px; --shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+    /* ── TOPBAR ── */
+    .top-bar {
+      background:var(--bg2); border-bottom:1px solid var(--card-border);
+      padding:18px 0; position:sticky; top:0; z-index:100;
+      backdrop-filter:blur(14px);
+    }
+    .top-bar .inner { max-width:1200px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; }
+    .top-bar .brand { font-size:20px; font-weight:800; text-decoration:none; color:var(--text); }
+    .top-bar .brand span { color:var(--accent); }
+    .top-bar .nav-links { display:flex; gap:20px; }
+    .top-bar .nav-links a { color:var(--text-dim); text-decoration:none; font-size:13px; font-weight:600; transition:color .2s; }
+    .top-bar .nav-links a:hover { color:var(--text); }
+
+    /* ── WRAPPER ── */
+    .page-wrap { max-width:1200px; margin:0 auto; padding:32px 24px; }
+
+    /* ── STEPS BAR ── */
+    .steps-bar { display:flex; align-items:center; gap:0; margin-bottom:36px; }
+    .step-item {
+      flex:1; text-align:center; position:relative; padding:14px 0;
+      font-size:12px; font-weight:600; color:var(--text-dim);
+      text-transform:uppercase; letter-spacing:.8px;
+    }
+    .step-item::after {
+      content:''; position:absolute; bottom:0; left:0; right:0; height:3px;
+      background:var(--card-border); border-radius:3px;
+    }
+    .step-item.active { color:var(--accent); }
+    .step-item.active::after { background:var(--accent); }
+    .step-item.done { color:var(--accent3); }
+    .step-item.done::after { background:var(--accent3); }
+    .step-num {
+      display:inline-flex; width:28px; height:28px; border-radius:50%;
+      align-items:center; justify-content:center;
+      background:var(--card); border:1px solid var(--card-border);
+      margin-right:6px; font-size:12px; font-weight:700;
+    }
+    .step-item.active .step-num { background:rgba(108,99,255,.2); border-color:var(--accent); color:var(--accent); }
+    .step-item.done .step-num { background:rgba(67,217,173,.2); border-color:var(--accent3); color:var(--accent3); }
+
+    /* ── SECTIONS ── */
+    .checkout-section { display:none; }
+    .checkout-section.active { display:block; animation:fadeUp .35s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ── CART GRID ── */
+    .cart-layout { display:grid; grid-template-columns:1fr 360px; gap:24px; }
+    @media(max-width:768px){ .cart-layout{grid-template-columns:1fr;} }
+
+    .cart-card {
+      background:var(--card); border:1px solid var(--card-border);
+      border-radius:var(--radius); overflow:hidden;
+    }
+    .cart-card-header {
+      padding:18px 22px; border-bottom:1px solid var(--card-border);
+      font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:space-between;
+    }
+
+    /* ── CART ITEM ── */
+    .cart-item {
+      display:flex; gap:16px; padding:16px 22px; align-items:center;
+      border-bottom:1px solid var(--card-border); transition:background .2s;
+    }
+    .cart-item:hover { background:rgba(255,255,255,.03); }
+    .cart-item:last-child { border-bottom:none; }
+    .ci-img { width:64px; height:64px; border-radius:10px; object-fit:cover; background:var(--bg3); }
+    .ci-info { flex:1; }
+    .ci-name { font-size:14px; font-weight:600; }
+    .ci-price { font-size:12px; color:var(--text-dim); margin-top:2px; }
+    .ci-qty {
+      display:flex; align-items:center; gap:0; border:1px solid var(--card-border);
+      border-radius:8px; overflow:hidden;
+    }
+    .ci-qty button {
+      width:32px; height:32px; background:var(--card); border:none;
+      color:var(--text); cursor:pointer; font-size:14px; transition:background .2s;
+    }
+    .ci-qty button:hover { background:rgba(255,255,255,.08); }
+    .ci-qty span { width:36px; text-align:center; font-size:13px; font-weight:600; }
+    .ci-subtotal { font-size:14px; font-weight:700; min-width:70px; text-align:right; }
+    .ci-remove {
+      width:30px; height:30px; border-radius:8px; border:none;
+      background:rgba(255,101,132,.1); color:var(--accent2);
+      cursor:pointer; font-size:12px; transition:all .2s;
+    }
+    .ci-remove:hover { background:rgba(255,101,132,.25); }
+
+    /* ── ORDER SUMMARY ── */
+    .summary-card {
+      background:var(--card); border:1px solid var(--card-border);
+      border-radius:var(--radius); padding:24px; position:sticky; top:80px;
+    }
+    .summary-card h3 { font-size:15px; font-weight:700; margin-bottom:20px; }
+    .summary-row { display:flex; justify-content:space-between; font-size:13px; margin-bottom:12px; }
+    .summary-row .label { color:var(--text-dim); }
+    .summary-row.total { font-size:18px; font-weight:800; padding-top:12px; border-top:1px solid var(--card-border); margin-top:8px; }
+    .summary-row.savings .val { color:var(--accent3); }
+
+    .promo-row { display:flex; gap:8px; margin:16px 0 20px; }
+    .promo-input {
+      flex:1; padding:10px 14px; border-radius:10px; border:1px solid var(--card-border);
+      background:rgba(255,255,255,.04); color:var(--text); font-family:inherit; font-size:13px; outline:none;
+    }
+    .promo-input:focus { border-color:var(--accent); }
+    .promo-btn {
+      padding:10px 16px; border-radius:10px; border:1px solid var(--accent);
+      background:rgba(108,99,255,.15); color:var(--accent);
+      font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; transition:all .2s;
+    }
+    .promo-btn:hover { background:rgba(108,99,255,.3); }
+
+    .checkout-btn {
+      width:100%; padding:14px; border:none; border-radius:12px;
+      background:linear-gradient(135deg,var(--accent),#8b5cf6); color:#fff;
+      font-family:inherit; font-size:14px; font-weight:700; cursor:pointer;
+      transition:all .25s; letter-spacing:.3px;
+    }
+    .checkout-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(108,99,255,.4); }
+    .checkout-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
+
+    .continue-btn {
+      display:block; text-align:center; margin-top:12px;
+      color:var(--text-dim); font-size:12px; font-weight:600; cursor:pointer;
+      text-decoration:none;
+    }
+    .continue-btn:hover { color:var(--text); }
+
+    /* ── EMPTY CART ── */
+    .empty-cart {
+      text-align:center; padding:60px 24px;
+      background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
+    }
+    .empty-cart i { font-size:60px; color:var(--text-dim); margin-bottom:16px; opacity:.3; }
+    .empty-cart h2 { font-size:20px; font-weight:700; margin-bottom:8px; }
+    .empty-cart p { color:var(--text-dim); font-size:13px; margin-bottom:20px; }
+    .shop-btn {
+      padding:12px 28px; border-radius:10px; border:none;
+      background:linear-gradient(135deg,var(--accent),#8b5cf6); color:#fff;
+      font-family:inherit; font-size:13px; font-weight:700; cursor:pointer;
+      text-decoration:none; transition:all .2s;
+    }
+    .shop-btn:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(108,99,255,.35); color:#fff; }
+
+    /* ── PAYMENT SECTION ── */
+    .pay-grid { display:grid; grid-template-columns:1fr 380px; gap:24px; }
+    @media(max-width:768px){ .pay-grid{grid-template-columns:1fr;} }
+
+    .pay-methods {
+      background:var(--card); border:1px solid var(--card-border);
+      border-radius:var(--radius); padding:24px;
+    }
+    .pay-methods h3 { font-size:15px; font-weight:700; margin-bottom:20px; }
+
+    .method-tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
+    .method-tab {
+      padding:10px 18px; border-radius:10px; border:1px solid var(--card-border);
+      background:var(--card); color:var(--text-dim);
+      font-family:inherit; font-size:12px; font-weight:600; cursor:pointer; transition:all .2s;
+      display:flex; align-items:center; gap:8px;
+    }
+    .method-tab:hover { border-color:rgba(108,99,255,.3); color:var(--text); }
+    .method-tab.active { border-color:var(--accent); background:rgba(108,99,255,.12); color:var(--accent); }
+    .method-tab i { font-size:16px; }
+
+    .pay-form { display:none; }
+    .pay-form.active { display:block; animation:fadeUp .3s ease; }
+
+    .form-group { margin-bottom:16px; }
+    .form-label { display:block; font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.6px; font-weight:600; margin-bottom:6px; }
+    .form-input {
+      width:100%; padding:12px 14px; border-radius:10px;
+      border:1px solid var(--card-border); background:rgba(255,255,255,.04);
+      color:var(--text); font-family:inherit; font-size:13px; outline:none; transition:border-color .2s;
+    }
+    .form-input:focus { border-color:var(--accent); }
+    .form-row { display:flex; gap:12px; }
+    .form-row .form-group { flex:1; }
+
+    .card-icons { display:flex; gap:8px; margin-top:8px; }
+    .card-icons img, .card-icons i {
+      height:24px; padding:2px 8px; border-radius:4px;
+      background:rgba(255,255,255,.08); font-size:18px; color:var(--text-dim);
+    }
+
+    .upi-apps { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+    .upi-app {
+      padding:10px 16px; border-radius:10px; border:1px solid var(--card-border);
+      background:var(--card); cursor:pointer; transition:all .2s;
+      font-size:12px; font-weight:600; display:flex; align-items:center; gap:6px;
+    }
+    .upi-app:hover { border-color:var(--accent); }
+    .upi-app.selected { border-color:var(--accent3); background:rgba(67,217,173,.1); color:var(--accent3); }
+
+    .wallet-option {
+      display:flex; align-items:center; gap:14px; padding:14px 18px;
+      border:1px solid var(--card-border); border-radius:12px;
+      background:var(--card); cursor:pointer; transition:all .2s; margin-bottom:10px;
+    }
+    .wallet-option:hover { border-color:var(--accent); }
+    .wallet-option.selected { border-color:var(--accent3); background:rgba(67,217,173,.1); }
+    .wallet-icon {
+      width:40px; height:40px; border-radius:10px; display:grid; place-items:center;
+      font-size:18px;
+    }
+    .wallet-name { font-size:13px; font-weight:600; }
+    .wallet-desc { font-size:11px; color:var(--text-dim); }
+
+    .pay-now-btn {
+      width:100%; padding:16px; border:none; border-radius:12px;
+      background:linear-gradient(135deg,var(--accent3),#20c997); color:#0d0f1a;
+      font-family:inherit; font-size:15px; font-weight:800; cursor:pointer;
+      transition:all .25s; margin-top:20px; letter-spacing:.3px;
+    }
+    .pay-now-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(67,217,173,.4); }
+    .pay-now-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+    .back-btn {
+      display:inline-flex; align-items:center; gap:6px;
+      color:var(--text-dim); font-size:13px; font-weight:600;
+      cursor:pointer; margin-bottom:20px; transition:color .2s;
+      background:none; border:none; font-family:inherit;
+    }
+    .back-btn:hover { color:var(--text); }
+
+    /* ── SECURE BADGE ── */
+    .secure-badge {
+      display:flex; align-items:center; gap:8px; justify-content:center;
+      margin-top:14px; font-size:11px; color:var(--text-dim);
+    }
+    .secure-badge i { color:var(--accent3); }
+
+    /* ── PROCESSING OVERLAY ── */
+    .processing-overlay {
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,.7);
+      z-index:500; place-items:center; backdrop-filter:blur(6px);
+    }
+    .processing-overlay.show { display:grid; }
+    .processing-box {
+      background:var(--bg2); border:1px solid var(--card-border);
+      border-radius:var(--radius); padding:40px 50px; text-align:center;
+      box-shadow:0 20px 60px rgba(0,0,0,.5);
+    }
+    .spinner {
+      width:50px; height:50px; border:4px solid var(--card-border);
+      border-top-color:var(--accent3); border-radius:50%;
+      animation:spin 1s linear infinite; margin:0 auto 20px;
+    }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .processing-box h3 { font-size:16px; font-weight:700; margin-bottom:6px; }
+    .processing-box p { font-size:12px; color:var(--text-dim); }
+
+    /* ── SUCCESS SECTION ── */
+    .success-card {
+      background:var(--card); border:1px solid var(--card-border);
+      border-radius:var(--radius); padding:48px; text-align:center;
+      max-width:560px; margin:0 auto;
+    }
+    .success-icon {
+      width:80px; height:80px; border-radius:50%;
+      background:rgba(67,217,173,.15); display:grid; place-items:center;
+      margin:0 auto 20px; font-size:36px; color:var(--accent3);
+      animation:scaleIn .5s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes scaleIn { from{transform:scale(0)} to{transform:scale(1)} }
+    .success-card h2 { font-size:24px; font-weight:800; margin-bottom:8px; }
+    .success-card p { color:var(--text-dim); font-size:13px; }
+    .order-id { font-size:14px; font-weight:700; color:var(--accent); margin:16px 0; }
+    .receipt-table {
+      width:100%; text-align:left; margin:20px 0; border-collapse:collapse;
+    }
+    .receipt-table th { font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.6px; padding:8px 0; border-bottom:1px solid var(--card-border); }
+    .receipt-table td { font-size:13px; padding:10px 0; border-bottom:1px solid var(--card-border); }
+    .receipt-total td { font-weight:800; font-size:15px; border-bottom:none; padding-top:14px; }
+
+    /* ── TOAST ── */
+    .toast-alert {
+      position:fixed; bottom:28px; right:28px;
+      background:var(--bg3); border:1px solid var(--card-border);
+      border-left:4px solid var(--accent3);
+      padding:14px 20px; border-radius:12px;
+      font-size:13px; font-weight:600; box-shadow:var(--shadow);
+      z-index:999; transform:translateY(100px); opacity:0;
+      transition:all .35s cubic-bezier(.34,1.56,.64,1);
+    }
+    .toast-alert.show { transform:translateY(0); opacity:1; }
+
+    /* ── PRINT STYLES ── */
+    @media print {
+      body { background: #0d0f1a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color: #e8e8f0 !important; }
+      .top-bar, .steps-bar, .checkout-btn, .promo-row, .back-btn, .pay-now-btn, .secure-badge, .shop-btn, ::-webkit-scrollbar { display: none !important; }
+      .page-wrap { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+      .checkout-section { display: none !important; }
+      .checkout-section#sec-success { display: block !important; margin: 0 !important; }
+      #receipt-card { background: #0d0f1a !important; border: 1px solid #2d304d !important; color: #e8e8f0 !important; width: 100% !important; padding: 40px !important; box-shadow: none !important; margin: 0 !important; border-radius: 0 !important; }
+      #receipt-card * { color: #e8e8f0 !important; }
+      #receipt-card .success-icon { display: none !important; }
+      #receipt-card h2 { color: #6c63ff !important; font-size: 24px !important; margin-bottom: 5px !important; display: block !important; }
+      #receipt-card p { display: block !important; color: #8888aa !important; }
+      .receipt-total td { color: #6c63ff !important; border-top: 2px solid #6c63ff !important; }
+      #receipt-card table { width: 100% !important; margin-top: 20px !important; border-collapse: collapse !important; }
+      #receipt-card table th { color: #8888aa !important; border-bottom: 1px solid #2d304d !important; text-transform: uppercase !important; }
+      #receipt-card table td { border-bottom: 1px solid rgba(255,255,255,0.05) !important; padding: 15px 0 !important; }
+      #receipt-card button { display: none !important; }
+      #receipt-card .secure-badge { display: block !important; color: #555577 !important; text-align: center !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="top-bar">
+  <div class="inner">
+    <a href="index.html" class="brand">Fashion<span>Hub</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="Shop.html">Shop</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="cart.html" style="color:var(--accent)"><i class="fa-solid fa-cart-shopping"></i> Cart (<span id="topbar-count">0</span>)</a>
+    </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-wrap">
+
+  <!-- STEPS BAR -->
+  <div class="steps-bar">
+    <div class="step-item active" id="step-1"><span class="step-num">1</span> Cart</div>
+    <div class="step-item" id="step-2"><span class="step-num">2</span> Payment</div>
+    <div class="step-item" id="step-3"><span class="step-num">3</span> Confirmation</div>
+  </div>
+
+  <!-- ═══ STEP 1: CART ═══ -->
+  <div class="checkout-section active" id="sec-cart">
+    <!-- Filled by JS -->
+  </div>
+
+  <!-- ═══ STEP 2: PAYMENT ═══ -->
+  <div class="checkout-section" id="sec-payment">
+    <button class="back-btn" onclick="goToStep(1)"><i class="fa-solid fa-arrow-left"></i> Back to Cart</button>
+
+    <div class="pay-grid">
+      <div class="pay-methods">
+        <h3>Select Payment Method</h3>
+
+        <div class="method-tabs">
+          <button class="method-tab active" data-method="card" onclick="switchMethod('card',this)">
+            <i class="fa-solid fa-credit-card"></i> Credit / Debit Card
+          </button>
+          <button class="method-tab" data-method="upi" onclick="switchMethod('upi',this)">
+            <i class="fa-solid fa-mobile-screen"></i> UPI
+          </button>
+          <button class="method-tab" data-method="wallet" onclick="switchMethod('wallet',this)">
+            <i class="fa-solid fa-wallet"></i> Wallet
+          </button>
+          <button class="method-tab" data-method="cod" onclick="switchMethod('cod',this)">
+            <i class="fa-solid fa-money-bill-wave"></i> Cash on Delivery
+          </button>
+        </div>
+
+        <!-- CARD FORM -->
+        <div class="pay-form active" id="form-card">
+          <div class="form-group">
+            <label class="form-label">Card Number</label>
+            <input class="form-input" id="card-number" type="text" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)">
+            <div class="card-icons">
+              <i class="fa-brands fa-cc-visa"></i>
+              <i class="fa-brands fa-cc-mastercard"></i>
+              <i class="fa-brands fa-cc-amex"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cardholder Name</label>
+            <input class="form-input" id="card-name" type="text" placeholder="John Doe">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Expiry Date</label>
+              <input class="form-input" id="card-expiry" type="text" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">CVV</label>
+              <input class="form-input" id="card-cvv" type="password" placeholder="•••" maxlength="4">
+            </div>
+          </div>
+          </div>
+        </div>
+
+        <!-- UPI FORM -->
+        <div class="pay-form" id="form-upi">
+          <div class="form-group">
+            <label class="form-label">UPI ID</label>
+            <input class="form-input" id="upi-id" type="text" placeholder="yourname@upi">
+          </div>
+          <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Or select an app:</p>
+          <div class="upi-apps">
+            <div class="upi-app" onclick="selectUPI(this,'Google Pay')"><i class="fa-brands fa-google-pay" style="font-size:18px"></i> Google Pay</div>
+            <div class="upi-app" onclick="selectUPI(this,'PhonePe')"><i class="fa-solid fa-mobile-screen" style="font-size:14px"></i> PhonePe</div>
+            <div class="upi-app" onclick="selectUPI(this,'Paytm')"><i class="fa-solid fa-wallet" style="font-size:14px"></i> Paytm</div>
+            <div class="upi-app" onclick="selectUPI(this,'BHIM')"><i class="fa-solid fa-building-columns" style="font-size:14px"></i> BHIM</div>
+          </div>
+        </div>
+
+        <!-- WALLET FORM -->
+        <div class="pay-form" id="form-wallet">
+          <div class="wallet-option" onclick="selectWallet(this,'Amazon Pay')">
+            <div class="wallet-icon" style="background:rgba(255,153,0,.15);color:#ff9900"><i class="fa-brands fa-amazon"></i></div>
+            <div><div class="wallet-name">Amazon Pay</div><div class="wallet-desc">Balance: ₹250.00</div></div>
+          </div>
+          <div class="wallet-option" onclick="selectWallet(this,'PayPal')">
+            <div class="wallet-icon" style="background:rgba(0,119,181,.15);color:#0077b5"><i class="fa-brands fa-paypal"></i></div>
+            <div><div class="wallet-name">PayPal</div><div class="wallet-desc">Balance: ₹1,200.00</div></div>
+          </div>
+          <div class="wallet-option" onclick="selectWallet(this,'Fashion Wallet')">
+            <div class="wallet-icon" style="background:rgba(108,99,255,.15);color:var(--accent)"><i class="fa-solid fa-store"></i></div>
+            <div><div class="wallet-name">FashionHub Wallet</div><div class="wallet-desc">Balance: ₹85.00</div></div>
+          </div>
+        </div>
+
+        <!-- COD FORM -->
+        <div class="pay-form" id="form-cod">
+          <div style="background:rgba(247,197,159,.1);border:1px solid rgba(247,197,159,.25);border-radius:12px;padding:20px;margin-bottom:16px">
+            <div style="display:flex;gap:12px;align-items:center">
+              <i class="fa-solid fa-money-bill-wave" style="font-size:24px;color:var(--accent4)"></i>
+              <div>
+                <div style="font-size:14px;font-weight:700">Cash on Delivery</div>
+                <div style="font-size:12px;color:var(--text-dim);margin-top:2px">Pay when your order arrives. Extra ₹2.00 handling fee applies.</div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Delivery Address</label>
+            <input class="form-input" id="cod-address" type="text" placeholder="123 Street Name, City, State">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input class="form-input" id="cod-phone" type="tel" placeholder="+91 98765 43210">
+          </div>
+        </div>
+
+        <button class="pay-now-btn" id="pay-btn" onclick="processPayment()">
+          <i class="fa-solid fa-lock"></i> Pay Now — ₹<span id="pay-amount">0.00</span>
+        </button>
+        <div class="secure-badge">
+          <i class="fa-solid fa-shield-halved"></i> 256-bit SSL Encrypted · Secure Payment
+        </div>
+      </div>
+
+      <!-- ORDER SUMMARY (payment side) -->
+      <div class="summary-card" id="pay-summary">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 3: SUCCESS ═══ -->
+  <div class="checkout-section" id="sec-success">
+    <div class="success-card" id="receipt-card">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+
+</div>
+
+<!-- PROCESSING OVERLAY -->
+<div class="processing-overlay" id="processing">
+  <div class="processing-box">
+    <div class="spinner"></div>
+    <h3 id="proc-title">Processing Payment</h3>
+    <p id="proc-msg">Please wait while we verify your payment…</p>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-alert" id="cart-toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script>
+// ── LS KEYS ──
+const CART_KEY = 'fashion_cart';
+const ORDERS_KEY = 'fashion_orders';
+const SESSION_KEY = 'fashion_session';
+const NOTIFS_KEY = 'fashion_notifications';
+
+function getCart(){ return JSON.parse(localStorage.getItem(CART_KEY)||'[]'); }
+function saveCart(c){ localStorage.setItem(CART_KEY, JSON.stringify(c)); updateTopbar(); }
+function getOrders(){ return JSON.parse(localStorage.getItem(ORDERS_KEY)||'[]'); }
+function saveOrders(o){ localStorage.setItem(ORDERS_KEY, JSON.stringify(o)); }
+function getSession(){ return JSON.parse(localStorage.getItem(SESSION_KEY)||'null'); }
+
+function updateTopbar(){
+  const c = getCart();
+  const n = c.reduce((s,i)=>s+i.qty, 0);
+  document.getElementById('topbar-count').textContent = n;
+}
+
+// ── TOAST ──
+let tt;
+function toast(msg, color='var(--accent3)'){
+  const t = document.getElementById('cart-toast');
+  t.textContent = msg; t.style.borderLeftColor = color;
+  t.classList.add('show');
+  clearTimeout(tt); tt = setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// ── STEP NAVIGATION ──
+let currentStep = 1;
+function goToStep(n){
+  currentStep = n;
+  document.querySelectorAll('.checkout-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.step-item').forEach((s,i)=>{
+    s.classList.remove('active','done');
+    if(i+1 < n) s.classList.add('done');
+    if(i+1 === n) s.classList.add('active');
+  });
+  const sections = ['sec-cart','sec-payment','sec-success'];
+  document.getElementById(sections[n-1]).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(n===1) renderCart();
+  if(n===2) renderPaySummary();
+}
+
+// ── PROMO CODE ──
+let promoApplied = false;
+let promoDiscount = 0;
+
+function applyPromo(){
+  const code = document.getElementById('promo-input').value.trim().toUpperCase();
+  const codes = { 'SAVE20': 20, 'FASHION10': 10, 'FIRST50': 50, 'WELCOME15': 15 };
+  if(promoApplied){ toast('Promo already applied','var(--accent4)'); return; }
+  if(codes[code]){
+    promoDiscount = codes[code];
+    promoApplied = true;
+    toast(`🎉 Promo "${code}" applied! ${promoDiscount}% off`, 'var(--accent3)');
+    renderCart();
+  } else {
+    toast('Invalid promo code','var(--accent2)');
+  }
+}
+
+// ── CART RENDERING ──
+function renderCart(){
+  const cart = getCart();
+  const sec = document.getElementById('sec-cart');
+
+  if(!cart.length){
+    sec.innerHTML = `
+      <div class="empty-cart">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <h2>Your cart is empty</h2>
+        <p>Looks like you haven't added anything yet.</p>
+        <a href="Shop.html" class="shop-btn">Continue Shopping</a>
+      </div>`;
+    return;
+  }
+
+  const subtotal = cart.reduce((s,i)=>s + i.qty * parseFloat(i.price), 0);
+  const shipping = subtotal > 100 ? 0 : 9.99;
+  const tax = subtotal * 0.08;
+  const discount = promoApplied ? subtotal * (promoDiscount/100) : 0;
+  const total = subtotal + shipping + tax - discount;
+
+  let itemsHTML = cart.map(item => {
+    const sub = (item.qty * parseFloat(item.price)).toFixed(2);
+    return `<div class="cart-item">
+      <img class="ci-img" src="${item.img||'img/product-1.jpg.webp'}" alt="${item.name}">
+      <div class="ci-info">
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-price">₹${parseFloat(item.price).toFixed(2)} each</div>
+      </div>
+      <div class="ci-qty">
+        <button onclick="changeQty('${item.id}',-1)">−</button>
+        <span>${item.qty}</span>
+        <button onclick="changeQty('${item.id}',1)">+</button>
+      </div>
+      <div class="ci-subtotal">₹${sub}</div>
+      <button class="ci-remove" onclick="removeItem('${item.id}')" title="Remove"><i class="fa-solid fa-trash"></i></button>
+    </div>`;
+  }).join('');
+
+  sec.innerHTML = `
+    <div class="cart-layout">
+      <div>
+        <div class="cart-card">
+          <div class="cart-card-header">
+            <span>Shopping Cart (${cart.reduce((s,i)=>s+i.qty,0)} items)</span>
+            <button onclick="clearCart()" style="background:none;border:none;color:var(--accent2);font-size:12px;font-weight:600;cursor:pointer"><i class="fa-solid fa-trash"></i> Clear All</button>
+          </div>
+          ${itemsHTML}
+        </div>
+        <a href="Shop.html" class="continue-btn" style="margin-top:16px"><i class="fa-solid fa-arrow-left"></i> Continue Shopping</a>
+      </div>
+      <div>
+        <div class="summary-card">
+          <h3>Order Summary</h3>
+          <div class="summary-row"><span class="label">Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div>
+          <div class="summary-row"><span class="label">Shipping</span><span>${shipping===0?'<span style="color:var(--accent3)">FREE</span>':'₹'+shipping.toFixed(2)}</span></div>
+          <div class="summary-row"><span class="label">Tax (8%)</span><span>₹${tax.toFixed(2)}</span></div>
+          ${promoApplied ? `<div class="summary-row savings"><span class="label">Discount (${promoDiscount}%)</span><span class="val">−₹${discount.toFixed(2)}</span></div>` : ''}
+          <div class="summary-row total"><span>Total</span><span>₹${total.toFixed(2)}</span></div>
+          <div class="promo-row">
+            <input class="promo-input" id="promo-input" placeholder="Promo code" value="${promoApplied ? 'Applied ✓' : ''}" ${promoApplied?'disabled':''}>
+            <button class="promo-btn" onclick="applyPromo()" ${promoApplied?'disabled':''}>Apply</button>
+          </div>
+          ${shipping===0?'<div style="font-size:11px;color:var(--accent3);margin-bottom:12px"><i class="fa-solid fa-truck"></i> Free shipping on orders over ₹100!</div>':'<div style="font-size:11px;color:var(--text-dim);margin-bottom:12px"><i class="fa-solid fa-truck"></i> Add ₹'+(100-subtotal).toFixed(2)+' more for free shipping</div>'}
+          <button class="checkout-btn" onclick="goToStep(2)"><i class="fa-solid fa-lock"></i> Proceed to Checkout</button>
+          <div class="secure-badge"><i class="fa-solid fa-shield-halved"></i> Secure Checkout</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── PAY SUMMARY ──
+function renderPaySummary(){
+  const cart = getCart();
+  const subtotal = cart.reduce((s,i)=>s+i.qty*parseFloat(i.price),0);
+  const shipping = subtotal > 100 ? 0 : 9.99;
+  const tax = subtotal * 0.08;
+  const discount = promoApplied ? subtotal*(promoDiscount/100) : 0;
+  const codFee = selectedMethod==='cod' ? 2 : 0;
+  const total = subtotal + shipping + tax - discount + codFee;
+
+  document.getElementById('pay-amount').textContent = total.toFixed(2);
+
+  const sum = document.getElementById('pay-summary');
+  sum.innerHTML = `
+    <h3>Order Summary</h3>
+    ${cart.map(i=>`<div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
+      <img src="${i.img||'img/product-1.jpg.webp'}" style="width:40px;height:40px;border-radius:8px;object-fit:cover">
+      <div style="flex:1"><div style="font-size:12px;font-weight:600">${i.name}</div><div style="font-size:11px;color:var(--text-dim)">Qty: ${i.qty}</div></div>
+      <div style="font-size:13px;font-weight:700">₹${(i.qty*parseFloat(i.price)).toFixed(2)}</div>
+    </div>`).join('')}
+    <div style="border-top:1px solid var(--card-border);padding-top:14px;margin-top:8px">
+      <div class="summary-row"><span class="label">Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div>
+      <div class="summary-row"><span class="label">Shipping</span><span>${shipping===0?'FREE':'₹'+shipping.toFixed(2)}</span></div>
+      <div class="summary-row"><span class="label">Tax</span><span>₹${tax.toFixed(2)}</span></div>
+      ${promoApplied?'<div class="summary-row savings"><span class="label">Discount</span><span class="val">−₹'+discount.toFixed(2)+'</span></div>':''}
+      ${codFee?'<div class="summary-row"><span class="label">COD Fee</span><span>₹2.00</span></div>':''}
+      <div class="summary-row total"><span>Total</span><span>₹${total.toFixed(2)}</span></div>
+    </div>`;
+}
+
+// ── CART ACTIONS ──
+function changeQty(id, delta){
+  const cart = getCart();
+  const item = cart.find(i=>i.id===id);
+  if(!item) return;
+  item.qty += delta;
+  if(item.qty < 1) item.qty = 1;
+  saveCart(cart); renderCart();
+}
+
+function removeItem(id){
+  let cart = getCart().filter(i=>i.id!==id);
+  saveCart(cart); renderCart();
+  toast('Item removed from cart','var(--accent4)');
+}
+
+function clearCart(){
+  saveCart([]); renderCart();
+  toast('Cart cleared','var(--accent2)');
+}
+
+// ── PAYMENT METHOD SWITCHING ──
+let selectedMethod = 'card';
+let selectedUPI = '';
+let selectedWalletName = '';
+
+function switchMethod(method, btn){
+  selectedMethod = method;
+  document.querySelectorAll('.method-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.pay-form').forEach(f=>f.classList.remove('active'));
+  document.getElementById('form-'+method).classList.add('active');
+  renderPaySummary();
+}
+
+function selectUPI(el, name){
+  selectedUPI = name;
+  document.querySelectorAll('.upi-app').forEach(a=>a.classList.remove('selected'));
+  el.classList.add('selected');
+  toast(name + ' selected','var(--accent)');
+}
+
+function selectWallet(el, name){
+  selectedWalletName = name;
+  document.querySelectorAll('.wallet-option').forEach(w=>w.classList.remove('selected'));
+  el.classList.add('selected');
+  toast(name + ' selected','var(--accent)');
+}
+
+// ── CARD FORMATTING ──
+function formatCard(input){
+  let v = input.value.replace(/\D/g,'');
+  v = v.replace(/(.{4})/g, '$1 ').trim();
+  input.value = v;
+}
+function formatExpiry(input){
+  let v = input.value.replace(/\D/g,'');
+  if(v.length > 2) v = v.slice(0,2)+'/'+v.slice(2);
+  input.value = v;
+}
+
+// ── PAYMENT VALIDATION ──
+function validatePayment(){
+  if(selectedMethod === 'card'){
+    const num = document.getElementById('card-number').value.replace(/\s/g,'');
+    const name = document.getElementById('card-name').value.trim();
+    const exp = document.getElementById('card-expiry').value.trim();
+    const cvv = document.getElementById('card-cvv').value.trim();
+    if(num.length < 15){ toast('Enter valid card number','var(--accent2)'); return false; }
+    if(!name){ toast('Enter cardholder name','var(--accent2)'); return false; }
+    if(exp.length < 5){ toast('Enter valid expiry date','var(--accent2)'); return false; }
+    if(cvv.length < 3){ toast('Enter valid CVV','var(--accent2)'); return false; }
+  } else if(selectedMethod === 'upi'){
+    const upiId = document.getElementById('upi-id').value.trim();
+    if(!upiId && !selectedUPI){ toast('Enter UPI ID or select an app','var(--accent2)'); return false; }
+  } else if(selectedMethod === 'wallet'){
+    if(!selectedWalletName){ toast('Select a wallet','var(--accent2)'); return false; }
+  } else if(selectedMethod === 'cod'){
+    const addr = document.getElementById('cod-address').value.trim();
+    const phone = document.getElementById('cod-phone').value.trim();
+    if(!addr){ toast('Enter delivery address','var(--accent2)'); return false; }
+    if(!phone){ toast('Enter phone number','var(--accent2)'); return false; }
+  }
+  return true;
+}
+
+// ── PROCESS PAYMENT ──
+function processPayment(){
+  if(!validatePayment()) return;
+
+  const overlay = document.getElementById('processing');
+  const titles = { card:'Processing Card Payment', upi:'Connecting to UPI', wallet:'Deducting from Wallet', cod:'Confirming Order' };
+  document.getElementById('proc-title').textContent = titles[selectedMethod] || 'Processing…';
+  document.getElementById('proc-msg').textContent = 'Please wait while we verify your payment…';
+  overlay.classList.add('show');
+
+  // Simulate processing
+  setTimeout(()=>{
+    document.getElementById('proc-msg').textContent = 'Payment verified! Generating receipt…';
+  }, 1500);
+
+  setTimeout(()=>{
+    overlay.classList.remove('show');
+    completeOrder();
+  }, 3000);
+}
+
+// ── COMPLETE ORDER ──
+let lastOrderData = null; // Store data for PDF download after cart is cleared
+
+function completeOrder(){
+  const cartSnapshot = getCart(); // Get data before clearing
+  const cart = cartSnapshot;
+  const subtotal = cart.reduce((s,i)=>s+i.qty*parseFloat(i.price),0);
+  const shipping = subtotal > 100 ? 0 : 9.99;
+  const tax = subtotal * 0.08;
+  const discount = promoApplied ? subtotal*(promoDiscount/100) : 0;
+  const codFee = selectedMethod==='cod' ? 2 : 0;
+  const total = subtotal + shipping + tax - discount + codFee;
+
+  const orderId = '#' + (1050 + Math.floor(Math.random()*900));
+  const methodNames = { card:'Credit Card', upi:'UPI', wallet:selectedWalletName||'Wallet', cod:'Cash on Delivery' };
+  const user = getSession();
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  const timeStr = now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+
+  // Store for PDF
+  lastOrderData = {
+    orderId, cart, subtotal, shipping, tax, discount, codFee, total, 
+    method: methodNames[selectedMethod], 
+    methodKey: selectedMethod,
+    date: dateStr, time: timeStr,
+    customerName: user ? user.name : 'Guest Customer',
+    customerEmail: user ? user.email : 'guest@visitor.com',
+    address: selectedMethod === 'cod' ? document.getElementById('cod-address').value : 'Standard Shipping',
+    promoApplied,
+    promoDiscount
+  };
+  const orders = getOrders();
+  cart.forEach(item=>{
+    orders.push({
+      id: orderId,
+      product: item.name,
+      date: dateStr,
+      status: 'pending',
+      amount: parseFloat((item.qty * parseFloat(item.price)).toFixed(2)),
+      customer: user ? user.name : 'Guest'
+    });
+  });
+  saveOrders(orders);
+  
+  // Add notification
+  const notifs = JSON.parse(localStorage.getItem(NOTIFS_KEY) || '[]');
+  notifs.unshift({
+    icon: 'fa-solid fa-bag-shopping',
+    bg: 'rgba(108,99,255,.15)',
+    color: 'var(--accent)',
+    text: `New Order ${orderId} placed by ${user ? user.name : 'Guest'}`,
+    time: 'Just now'
+  });
+  localStorage.setItem(NOTIFS_KEY, JSON.stringify(notifs.slice(0, 10)));
+
+  // Render receipt
+  // Render detailed invoice directly on screen
+  const card = document.getElementById('receipt-card');
+  card.innerHTML = `
+    <div style="background:var(--bg2); border:1px solid var(--card-border); border-radius:var(--radius); overflow:hidden; text-align:left">
+      <!-- HEADER -->
+      <div style="background:linear-gradient(135deg,var(--accent),#8b5cf6); padding:40px; text-align:center; position:relative">
+        <div class="success-icon" style="background:rgba(255,255,255,0.2); color:#fff; border:2px solid #fff; margin-bottom:15px"><i class="fa-solid fa-check"></i></div>
+        <h2 style="color:#fff; margin-bottom:5px">Order Confirmed!</h2>
+        <p style="color:rgba(255,255,255,0.8); font-size:13px">Your receipt #${orderId.replace('#','')} is ready.</p>
+      </div>
+
+      <div style="padding:40px">
+        <div style="display:flex; justify-content:space-between; margin-bottom:30px; border-bottom:1px solid var(--card-border); padding-bottom:20px">
+          <div>
+            <div style="font-size:11px; text-transform:uppercase; color:var(--text-dim); font-weight:700; letter-spacing:1px; margin-bottom:8px">Billed To</div>
+            <div style="font-size:15px; font-weight:700">${user ? user.name : 'Guest Customer'}</div>
+            <div style="font-size:13px; color:var(--text-dim)">${user ? user.email : 'contact@visitor.com'}</div>
+            ${selectedMethod === 'cod' ? `<div style="font-size:13px; color:var(--text-dim); margin-top:5px"><i class="fa-solid fa-location-dot"></i> ${document.getElementById('cod-address').value}</div>` : ''}
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px; text-transform:uppercase; color:var(--text-dim); font-weight:700; letter-spacing:1px; margin-bottom:8px">Payment Info</div>
+            <div style="font-size:14px; font-weight:700">${methodNames[selectedMethod]}</div>
+            <div style="font-size:13px; color:var(--accent3); font-weight:700; margin-top:4px">${selectedMethod === 'cod' ? 'PENDING' : 'SUCCESSFUL'}</div>
+          </div>
+        </div>
+
+        <div style="font-size:11px; text-transform:uppercase; color:var(--text-dim); font-weight:700; letter-spacing:1px; margin-bottom:15px">Order Items</div>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:30px">
+          <thead>
+            <tr style="border-bottom:1px solid var(--card-border)">
+              <th style="padding:12px 0; text-align:left; font-size:12px; color:var(--text-dim)">Item</th>
+              <th style="padding:12px 0; text-align:center; font-size:12px; color:var(--text-dim)">Price</th>
+              <th style="padding:12px 0; text-align:center; font-size:12px; color:var(--text-dim)">Qty</th>
+              <th style="padding:12px 0; text-align:right; font-size:12px; color:var(--text-dim)">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${cart.map(i => `
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                <td style="padding:15px 0; font-size:14px; font-weight:600">${i.name}</td>
+                <td style="padding:15px 0; font-size:13px; text-align:center">₹${parseFloat(i.price).toFixed(2)}</td>
+                <td style="padding:15px 0; font-size:13px; text-align:center">${i.qty}</td>
+                <td style="padding:15px 0; font-size:14px; font-weight:700; text-align:right">₹${(i.qty * parseFloat(i.price)).toFixed(2)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div style="display:flex; justify-content:flex-end">
+          <div style="width:250px">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:13px">
+              <span style="color:var(--text-dim)">Subtotal</span>
+              <span>₹${subtotal.toFixed(2)}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:13px">
+              <span style="color:var(--text-dim)">Shipping</span>
+              <span>${shipping === 0 ? '<span style="color:var(--accent3)">FREE</span>' : '₹' + shipping.toFixed(2)}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:13px">
+              <span style="color:var(--text-dim)">Estimated Tax</span>
+              <span>₹${tax.toFixed(2)}</span>
+            </div>
+            ${promoApplied ? `<div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:13px; color:var(--accent3)"><span>Discount</span><span>- ₹${discount.toFixed(2)}</span></div>` : ''}
+            ${codFee ? `<div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:13px; color:var(--accent4)"><span>COD Fee</span><span>₹2.00</span></div>` : ''}
+            <div style="display:flex; justify-content:space-between; margin-top:15px; border-top:1px solid var(--accent); padding-top:15px">
+              <span style="font-size:16px; font-weight:800">Total Amount</span>
+              <span style="font-size:20px; font-weight:800; color:var(--accent)">₹${total.toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:40px; display:flex; gap:12px; flex-wrap:wrap">
+          <button onclick="printInvoice()" class="shop-btn" style="flex:1; background:var(--accent); color:#fff"><i class="fa-solid fa-print"></i> Print Invoice</button>
+          <button onclick="downloadReceipt('${orderId}')" class="shop-btn" style="flex:1; background:var(--bg3); border:1px solid var(--card-border); color:var(--text)"><i class="fa-solid fa-download"></i> Save PDF</button>
+          <a href="Shop.html" class="shop-btn" style="flex:1"><i class="fa-solid fa-shopping-bag"></i> Shop More</a>
+          <a href="dashboard.html" class="shop-btn" style="flex:1; background:linear-gradient(135deg,var(--accent3),#20c997); color:#0d0f1a"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        </div>
+      </div>
+    </div>
+    <div class="secure-badge" style="margin-top:20px"><i class="fa-solid fa-shield-halved"></i> Digital Invoice Securely Stored • Check your email</div>
+  `;
+
+  // Clear cart
+  saveCart([]);
+  promoApplied = false; promoDiscount = 0;
+
+  goToStep(3);
+  toast('Order placed successfully! 🎉','var(--accent3)');
+  
+  // Auto-actions: Print then Download
+  setTimeout(() => {
+    // Open Print Dialog
+    printInvoice();
+    
+    // When print dialog is closed (printed or cancelled), start PDF download
+    window.onafterprint = () => {
+      downloadReceipt(orderId);
+      window.onafterprint = null; // Clear handler
+    };
+  }, 2500);
+}
+
+// ── DOWNLOAD RECEIPT ──
+function downloadReceipt(orderId) {
+  // Use the stored data from the last order
+  const data = lastOrderData;
+  
+  if(!data || data.orderId !== orderId) {
+    toast('Order data not found for PDF','var(--accent2)');
+    return;
+  }
+
+  const { cart, subtotal, shipping, tax, discount, codFee, total, date, time, customerName, customerEmail, address, method, methodKey, promoApplied, promoDiscount } = data;
+
+  // Create the invoice element
+  const invoice = document.createElement('div');
+  invoice.id = 'temp-invoice-' + Date.now();
+  
+  // Set styles to ensure it renders off-screen but "properly"
+  Object.assign(invoice.style, {
+    position: 'absolute',
+    left: '-9999px',
+    top: '0',
+    width: '800px',
+    padding: '40px 60px',
+    background: '#0d0f1a', // Using the exact theme background
+    color: '#e8e8f0',
+    fontFamily: "'Inter', 'Segoe UI', Roboto, sans-serif",
+    lineHeight: '1.5'
+  });
+
+  invoice.innerHTML = `
+    <!-- HEADER -->
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:40px; border-bottom:2px solid #6c63ff; padding-bottom:20px">
+      <div>
+        <div style="font-size:32px; font-weight:800; color:#6c63ff; letter-spacing:1px">FASHION<span style="color:#ffffff">HUB</span></div>
+        <div style="font-size:12px; color:#8888aa; margin-top:4px">Premium Global Retailer • fashionhub.com</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:24px; font-weight:700; color:#ffffff; margin-bottom:4px">TAX INVOICE</div>
+        <div style="font-size:13px; color:#8888aa">Date: ${date} at ${time}</div>
+      </div>
+    </div>
+
+    <!-- META INFO -->
+    <div style="display:flex; justify-content:space-between; margin-bottom:40px">
+      <div style="flex:1">
+        <div style="font-size:11px; text-transform:uppercase; color:#6c63ff; font-weight:700; margin-bottom:8px; letter-spacing:1px">CUSTOMER DETAILS</div>
+        <div style="font-size:16px; font-weight:700; color:#ffffff">${customerName}</div>
+        <div style="font-size:13px; color:#8888aa">${customerEmail}</div>
+        <div style="font-size:13px; color:#8888aa; margin-top:8px"><strong>Delivery:</strong><br>${address}</div>
+      </div>
+      <div style="flex:1; text-align:right">
+        <div style="font-size:11px; text-transform:uppercase; color:#6c63ff; font-weight:700; margin-bottom:8px; letter-spacing:1px">ORDER SUMMARY</div>
+        <div style="font-size:14px; color:#ffffff">Order No: <strong>${orderId}</strong></div>
+        <div style="font-size:13px; color:#8888aa">Method: ${method}</div>
+        <div style="display:inline-block; margin-top:8px; padding:4px 12px; background:rgba(67,217,173,0.1); border:1px solid rgba(67,217,173,0.2); border-radius:4px; color:#43d9ad; font-size:11px; font-weight:700">
+          ${methodKey === 'cod' ? 'PENDING PAYMENT ON DELIVERY' : 'PAYMENT SUCCESSFUL'}
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <table style="width:100%; border-collapse:collapse; margin-bottom:30px">
+      <thead>
+        <tr style="background:rgba(255,255,255,0.03)">
+          <th style="padding:15px; text-align:left; font-size:11px; color:#8888aa; text-transform:uppercase; border-bottom:1px solid #2d304d">Items</th>
+          <th style="padding:15px; text-align:center; font-size:11px; color:#8888aa; text-transform:uppercase; border-bottom:1px solid #2d304d">Unit Price</th>
+          <th style="padding:15px; text-align:center; font-size:11px; color:#8888aa; text-transform:uppercase; border-bottom:1px solid #2d304d">Qty</th>
+          <th style="padding:15px; text-align:right; font-size:11px; color:#8888aa; text-transform:uppercase; border-bottom:1px solid #2d304d">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${cart.map(i => `
+          <tr style="border-bottom:1px solid #1a1d35">
+            <td style="padding:18px 15px; color:#ffffff; display:flex; align-items:center; gap:15px">
+              <img src="${i.img || 'img/product-1.jpg.webp'}" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid #2d304d">
+              <div>
+                <div style="font-weight:700; font-size:14px">${i.name}</div>
+                <div style="font-size:11px; color:#8888aa">ID: #${Math.floor(Math.random()*10000)}</div>
+              </div>
+            </td>
+            <td style="padding:18px 15px; text-align:center; color:#e8e8f0; font-size:13px">₹${parseFloat(i.price).toFixed(2)}</td>
+            <td style="padding:18px 15px; text-align:center; color:#e8e8f0; font-size:13px">${i.qty}</td>
+            <td style="padding:18px 15px; text-align:right; color:#ffffff; font-size:14px; font-weight:700">₹${(i.qty * parseFloat(i.price)).toFixed(2)}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+
+    <!-- TOTALS -->
+    <div style="display:flex; justify-content:flex-end">
+      <div style="width:280px">
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px">
+          <span style="color:#8888aa">Subtotal</span>
+          <span style="color:#e8e8f0">₹${subtotal.toFixed(2)}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px">
+          <span style="color:#8888aa">Shipping & Handling</span>
+          <span style="color:#e8e8f0">${shipping === 0 ? '<span style="color:#43d9ad">FREE</span>' : '₹' + shipping.toFixed(2)}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px">
+          <span style="color:#8888aa">Estimated Tax (8%)</span>
+          <span style="color:#e8e8f0">₹${tax.toFixed(2)}</span>
+        </div>
+        ${promoApplied ? `
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; color:#43d9ad">
+            <span>Special Discount</span>
+            <span>- ₹${discount.toFixed(2)}</span>
+          </div>` : ''}
+        ${codFee ? `
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px">
+            <span style="color:#8888aa">COD Service Charge</span>
+            <span style="color:#e8e8f0">₹2.00</span>
+          </div>` : ''}
+        <div style="display:flex; justify-content:space-between; margin-top:15px; padding-top:15px; border-top:1px solid #6c63ff">
+          <span style="font-size:16px; font-weight:800; color:#ffffff">Order Total</span>
+          <span style="font-size:22px; font-weight:800; color:#6c63ff">₹${total.toFixed(2)}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div style="margin-top:70px; text-align:center; padding:30px; border-radius:12px; background:rgba(255,255,255,0.02)">
+      <div style="font-size:14px; font-weight:700; color:#6c63ff; margin-bottom:4px">THANK YOU!</div>
+      <div style="font-size:12px; color:#8888aa">We appreciate your business. Looking forward to your next visit!</div>
+      <div style="margin-top:20px; font-size:10px; color:#555577; text-transform:uppercase; letter-spacing:1px">
+        This is a digitally generated invoice • Securely Processed via FASHIONHUB Gateway
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(invoice);
+
+  const opt = {
+    margin:       10,
+    filename:     `FashionHub_Invoice_${orderId.replace('#','')}.pdf`,
+    image:        { type: 'jpeg', quality: 1 },
+    html2canvas:  { 
+      scale: 2, 
+      backgroundColor: '#0d0f1a', 
+      useCORS: true, 
+      logging: false,
+      scrollY: -window.scrollY
+    },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  toast('Preparing Your Proper Invoice...', 'var(--accent3)');
+  
+  html2pdf().set(opt).from(invoice).save().then(() => {
+    document.body.removeChild(invoice);
+    toast('Invoice Downloaded Successfully!', 'var(--accent3)');
+  });
+}
+
+// ── PRINT INVOICE ──
+function printInvoice() {
+  window.print();
+}
+
+// ── INIT ──
+updateTopbar();
+renderCart();
+</script>
+</body>
+</html>

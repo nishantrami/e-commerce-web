@@ -25,21 +25,17 @@
         </div>
         <div class="offcanvas-body justify-content-end">
           <ul class="navbar-nav justify-content-center flex-grow-1 pe-3">
-            <li class="nav-item ms-2">
-              <a class="nav-link" aria-current="page" href="index.html">Home</a>
-            </li>
-            <li class="nav-item ms-2">
-              <a class="nav-link" href="Shop.html">Shop</a>
-            </li>
-            <li class="nav-item ms-2">
-              <a class="nav-link active link-light" href="#">About us</a>
-            </li>
-            <li class="nav-item ms-2">
-              <a class="nav-link" href="Blog.html">Blog</a>
-            </li>
-            <li class="nav-item ms-2">
-              <a class="nav-link" href="Contact.html">Contact</a>
-            </li>
+            <li class="nav-item ms-2"><a class="nav-link" aria-current="page" href="index.html">Home</a></li>
+            <li class="nav-item ms-2"><a class="nav-link" href="Shop.html">Shop</a></li>
+            <li class="nav-item ms-2"><a class="nav-link active link-light" href="#">About us</a></li>
+            <li class="nav-item ms-2"><a class="nav-link" href="Blog.html">Blog</a></li>
+            <li class="nav-item ms-2"><a class="nav-link" href="Contact.html">Contact</a></li>
+            <li class="nav-item guest-item ms-2" id="nav-login" style="display:none;"><a class="nav-link" href="login.html">Login</a></li>
+            <li class="nav-item guest-item ms-2" id="nav-register" style="display:none;"><a class="nav-link" href="register.html">Register</a></li>
+            <li class="nav-item auth-item ms-2" id="nav-dashboard" style="display:none;"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+            <li class="nav-item auth-item ms-2" id="admin-panel-link" style="display:none;"><a class="nav-link" href="dashboard.html#admin-section">Admin Panel</a></li>
+            <li class="nav-item auth-item ms-2" id="nav-logout" style="display:none;"><a class="nav-link" href="#" id="logout-btn">Logout</a></li>
+            <li class="nav-item auth-item ms-2" style="display:none;"><a class="nav-link disabled" id="nav-user-name" href="#"></a></li>
           </ul>
           <div class="icon">
             <a href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
@@ -56,28 +52,28 @@
   </nav>
   <!--Headre section end-->
   <div class="container-fluid we">
-    <div class="row mt-4">
-      <p class="text link-light col-lg-9">About Us</p>
-      <h5 class="blog-text col-lg-4 link-light"><a href="#">Home ></a> About Us</h5>
+    <div class="row mt-4 mg">
+      <p class="text link-light col-12 col-lg-9">About Us</p>
+      <h5 class="blog-text col-12 col-lg-4 link-light"><a href="#">Home ></a> About Us</h5>
     </div>
   </div>
-  <div class="text-center py-4 we">
-    <img src="img/about-us.jpg.webp" alt="Clothing Display" class="main-image">
+  <div class="text-center py-3 py-md-4 we">
+    <img src="img/about-us.jpg.webp" alt="Clothing Display" class="main-image img-fluid w-90" style="max-width: 100%; height: auto;">
   </div>
 
   <!-- Info Section -->
-  <div class="info-section text-center we">
-    <div class="container">
-      <div class="row bg-light">
+  <div class="info-section text-center we" style="width: 90%;">
+    <div class="container-fluid">
+      <div class="row bg-light g-3 g-md-0">
         <!-- Column 1 -->
-        <div class="col-md-4 mb-4">
+        <div class="col-12 col-sm-6 col-lg-4 mb-4 mb-lg-0">
           <div class="info-title">Who We Are ?</div>
           <div class="info-text">
             Contextual advertising programs sometimes have strict policies regarding certain content.
           </div>
         </div>
         <!-- Column 2 -->
-        <div class="col-md-4 mb-4">
+        <div class="col-12 col-sm-6 col-lg-4 mb-4 mb-lg-0">
           <div class="info-title">Who We Do ?</div>
           <div class="info-text">
             In this digital generation where information can be accessed instantly, our services connect fashion with
@@ -85,7 +81,7 @@
           </div>
         </div>
         <!-- Column 3 -->
-        <div class="col-md-4 mb-4">
+        <div class="col-12 col-sm-12 col-lg-4 mb-4 mb-lg-0">
           <div class="info-title">Why Choose Us</div>
           <div class="info-text">
             We offer curated collections, quality service, and a passion for sustainable, stylish clothing.
@@ -98,19 +94,35 @@
   <!--client section start-->
   <div class="container we">
     <div class="clients-section">
-      <p class="subheading">PARTNER</p>
-      <h2 class="heading">Happy Clients</h2>
+      <p class="subheading text-center">PARTNER</p>
+      <h2 class="heading text-center mb-4 mb-md-5">Happy Clients</h2>
 
-      <div class="clients-logos">
+      <div class="clients-logos row g-3 g-md-4 justify-content-center">
         <!-- Repeat logos - use placeholder or real images -->
-        <img src="img/client-1.png.webp" alt="Client Logo">
-        <img src="img/client-2.png.webp" alt="Client Logo">
-        <img src="img/client-3.png.webp" alt="Client Logo">
-        <img src="img/client-4.png.webp" alt="Client Logo">
-        <img src="img/client-5.png.webp" alt="Client Logo">
-        <img src="img/client-6.png.webp" alt="Client Logo">
-        <img src="img/client-7.png.webp" alt="Client Logo">
-        <img src="img/client-8.png.webp" alt="Client Logo">
+        <div class="col-6 col-sm-4 col-md-3 text-center">
+          <img src="img/client-1.png.webp" alt="Client Logo" class="img-fluid">
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 text-center">
+          <img src="img/client-2.png.webp" alt="Client Logo" class="img-fluid">
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 text-center">
+          <img src="img/client-3.png.webp" alt="Client Logo" class="img-fluid">
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 text-center">
+          <img src="img/client-4.png.webp" alt="Client Logo" class="img-fluid">
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 text-center">
+          <img src="img/client-5.png.webp" alt="Client Logo" class="img-fluid">
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 text-center">
+          <img src="img/client-6.png.webp" alt="Client Logo" class="img-fluid">
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 text-center">
+          <img src="img/client-7.png.webp" alt="Client Logo" class="img-fluid">
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 text-center">
+          <img src="img/client-8.png.webp" alt="Client Logo" class="img-fluid">
+        </div>
       </div>
     </div>
   </div>
@@ -118,11 +130,11 @@
 
   <!--footer start-->
   <div class="f1 container-fluid we">
-    <footer class="footer">
+    <footer class="footer mt-5">
       <div class="footer-container-fluid">
         <!-- About Section -->
         <div class="footer-col">
-          <h2 class="logo"><a href="index.html"><img src="img/footer-logo.png.webp" alt=""></a></h2>
+          <h2 class="logo"><a href="index.html"><img src="img/footer-logo.png.webp" alt="Logo"></a></h2>
           <div class="payment-methods">
             <img src="img/bitcoin.png" alt="Bitcoin">
             <img src="img/amex.png" alt="Amex">
@@ -143,7 +155,7 @@
         </div>
         <!-- Help Links -->
         <div class="footer-col">
-          <h4>SHOPPING</h4>
+          <h4>HELP & SUPPORT</h4>
           <ul>
             <li><a href="#">Contact Us</a></li>
             <li><a href="#">Payment Methods</a></li>
@@ -156,15 +168,15 @@
 
       <!-- Bottom Footer -->
       <div class="footer-bottom">
-        <p>Copyright © 20252020 All rights reserved | This template is made with <span class="heart">❤</span> by <a
+        <p>Copyright © 2025 All rights reserved | This template is made with <span class="heart">❤</span> by <a
             href="https://colorlib.com">Colorlib</a></p>
       </div>
     </footer>
   </div>
-</body>
 <script src="js/j.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/owl.carousel.min.js"></script>
 <script src="js/wow.min.js"></script>
 <script src="js/bootstrap.bundle.min.js"></script>
-
+</body>
 </html>

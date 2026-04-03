@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/animate.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-light fixed-top we">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html"><img src="img/logo.png.webp" alt="Fashion Store Logo"></a>
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasNavbarLabel"><img src="img/logo.png.webp" alt="Logo"> Menu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body justify-content-end">
+          <ul class="navbar-nav justify-content-center flex-grow-1 pe-3">
+            <li class="nav-item ms-2"><a class="nav-link" href="index.html">Home</a></li>
+            <li class="nav-item ms-2"><a class="nav-link" href="Shop.html">Shop</a></li>
+            <li class="nav-item ms-2"><a class="nav-link" href="About.html">About us</a></li>
+            <li class="nav-item ms-2"><a class="nav-link" href="Blog.html">Blog</a></li>
+            <li class="nav-item ms-2"><a class="nav-link" href="Contact.html">Contact</a></li>
+            <li class="nav-item ms-2"><a class="nav-link" href="cart.html">Cart <span id="cart-count" class="badge bg-danger">0</span></a></li>
+            <li class="nav-item guest-item ms-2" id="nav-login" style="display:none;"><a class="nav-link" href="login.html">Login</a></li>
+            <li class="nav-item guest-item ms-2" id="nav-register" style="display:none;"><a class="nav-link" href="register.html">Register</a></li>
+            <li class="nav-item auth-item ms-2" id="nav-dashboard" style="display:none;"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+            <li class="nav-item auth-item ms-2" id="admin-panel-link" style="display:none;"><a class="nav-link" href="dashboard.html#admin-section">Admin Panel</a></li>
+            <li class="nav-item auth-item ms-2" id="nav-logout" style="display:none;"><a class="nav-link" href="#" id="logout-btn">Logout</a></li>
+            <li class="nav-item auth-item ms-2" style="display:none;"><a class="nav-link disabled" id="nav-user-name" href="#"></a></li>
+          </ul>
+        </div>
+      </div>
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+    </div>
+  </nav>
+
+  <main class="container-fluid py-5 auth-container we">
+    <div class="animated-bg"></div>
+    <div class="row justify-content-center we">
+      <div class="col-12">
+        <div class="card shadow-lg animate__animated animate__fadeInUp border-0 rounded-4 overflow-hidden glass-card">
+          <div class="card-header bg-gradient-success text-white text-center py-4 position-relative">
+            <div class="floating-shapes">
+              <div class="shape shape-1"></div>
+              <div class="shape shape-2"></div>
+              <div class="shape shape-3"></div>
+            </div>
+            <h2 class="mb-0 animate__animated animate__bounce animate__delay-1s">Join Us</h2>
+            <p class="mb-0 animate__animated animate__fadeIn animate__delay-2s">Create your account</p>
+          </div>
+          <div class="card-body p-4">
+            <form id="register-form">
+              <div class="mb-4 animate__animated animate__fadeInLeft animate__delay-1s">
+                <div class="floating-label-group">
+                  <input type="text" class="form-control form-control-lg floating-input" id="register-name" placeholder="Enter Name" required>
+                  <label for="register-name" class="floating-label">
+                    <i class="fas fa-user me-2"></i>Full Name
+                  </label>
+                  <span class="input-icon"><i class="fas fa-user"></i></span>
+                </div>
+              </div>
+              <div class="mb-4 animate__animated animate__fadeInLeft animate__delay-2s">
+                <div class="floating-label-group">
+                  <input type="email" class="form-control form-control-lg floating-input" id="register-email" placeholder="Enter Email" required>
+                  <label for="register-email" class="floating-label">
+                    <i class="fas fa-envelope me-2"></i>Email address
+                  </label>
+                  <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                </div>
+              </div>
+              <div class="mb-4 animate__animated animate__fadeInLeft animate__delay-3s">
+                <div class="floating-label-group">
+                  <input type="password" class="form-control form-control-lg floating-input" id="register-password" placeholder="Enter Password" autocomplete="new-password" required>
+                  <label for="register-password" class="floating-label">
+                    <i class="fas fa-lock me-2"></i>Password
+                  </label>
+                  <span class="input-icon"><i class="fas fa-lock"></i></span>
+                  <button type="button" class="password-toggle" data-target="register-password">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="mb-4 animate__animated animate__fadeInLeft animate__delay-4s">
+                <div class="floating-label-group">
+                  <select class="form-control form-control-lg floating-input" id="register-role">
+                    <option value="user" selected>User</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <label for="register-role" class="floating-label">
+                    <i class="fas fa-user-tag me-2"></i>Role
+                  </label>
+                  <span class="input-icon"><i class="fas fa-user-tag"></i></span>
+                </div>
+              </div>
+              <div class="mb-4 animate__animated animate__fadeInUp animate__delay-5s">
+                <div id="register-message" class="small text-center animate__animated"></div>
+              </div>
+              <div class="d-grid animate__animated animate__zoomIn animate__delay-6s">
+                <button type="submit" class="btn btn-success btn-lg submit-btn">
+                  <span class="btn-text">Register</span>
+                  <div class="spinner-border spinner-border-sm ms-2 d-none" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </button>
+              </div>
+              <div class="text-center mt-3 animate__animated animate__fadeIn animate__delay-7s">
+                <a href="login.html" class="btn btn-outline-success link-btn">Already have an account? Login</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/j.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/wow.min.js"></script>
+  <script src="js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -10,9 +10,8 @@
   <link rel="stylesheet" href="css/owl.carousel.min.css">
   <link rel="stylesheet" href="css/owl.theme.default.min.css">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
-
 <body>
   <!--header section start-->
   <nav class="navbar navbar-expand-lg bg-light fixed-top we">
@@ -40,11 +39,28 @@
             <li class="nav-item ms-2">
               <a class="nav-link" href="Contact.html">Contact</a>
             </li>
+            <li class="nav-item guest-item ms-2" id="nav-login" style="display:none;">
+              <a class="nav-link" href="login.html">Login</a>
+            </li>
+            <li class="nav-item guest-item ms-2" id="nav-register" style="display:none;">
+              <a class="nav-link" href="register.html">Register</a>
+            </li>
+            <li class="nav-item auth-item ms-2" id="nav-dashboard" style="display:none;">
+              <a class="nav-link" href="dashboard.html">Dashboard</a>
+            </li>
+            <li class="nav-item auth-item ms-2" id="admin-panel-link" style="display:none;">
+              <a class="nav-link" href="dashboard.html#admin-section">Admin Panel</a>
+            </li>
+            <li class="nav-item auth-item ms-2" id="nav-logout" style="display:none;">
+              <a class="nav-link" href="#" id="logout-btn">Logout</a>
+            </li>
+            <li class="nav-item auth-item ms-2" style="display:none;">
+              <a class="nav-link disabled" id="nav-user-name" href="#"></a>
+            </li>
           </ul>
           <div class="icon">
-<a href="#" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></a>
-<a href="#" aria-label="Wishlist"><i class="fa-regular fa-heart"></i></a>
-<a href="#" aria-label="Shopping Cart"><i class="fa-solid fa-cart-plus"></i></a>
+          <a href="#" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i><span class="visually-hidden">Search</span></a>
+          <a href="cart.html" aria-label="Shopping Cart"><i class="fa-solid fa-cart-shopping"></i> <span class="cart-count-badge badge bg-danger">0</span><span class="visually-hidden">Cart</span></a>
           </div>
         </div>
       </div>
@@ -125,54 +141,54 @@
   <div class="we">
     <p class="card-text text-center sop ">Shopping Now</p>
     <div class="card-group m-5 ">
-      <div class="card lg-md-2">
-        <img src="img/product-1.jpg.webp" class="card-img-top" alt="...">
+      <div class="card lg-md-2 animate__animated animate__fadeInUp">
+        <img src="img/product-1.jpg.webp" class="card-img-top" alt="Piqué Shoes">
         <div class="card-body">
           <h5 class="card-title">Piqué Shoes</h5>
-          <p class="card-text">$67.24</p>
-          <b class="card-text"><a href="#" class="text-danger">+ add to cart</a></b>
+          <p class="card-text">₹4,999.00</p>
+          <button type="button" class="btn btn-sm btn-outline-danger add-to-cart-btn" data-id="pique-shoes" data-name="Piqué Shoes" data-price="4999" data-img="img/product-1.jpg.webp">Add to cart</button>
         </div>
       </div>
-      <div class="card">
-        <img src="img/product-2.jpg.webp" class="card-img-top" alt="...">
+      <div class="card animate__animated animate__fadeInUp animate__delay-1s">
+        <img src="img/product-2.jpg.webp" class="card-img-top" alt="Piqué Biker Jacket">
         <div class="card-body">
           <h5 class="card-title">Piqué Biker Jacket</h5>
-          <p class="card-text">$67.24</p>
-          <b class="card-text"><a href="#" class="text-danger">+ add to cart</a></b>
+          <p class="card-text">₹5,499.00</p>
+          <button type="button" class="btn btn-sm btn-outline-danger add-to-cart-btn" data-id="pique-jacket" data-name="Piqué Biker Jacket" data-price="5499" data-img="img/product-2.jpg.webp">Add to cart</button>
         </div>
       </div>
-      <div class="card">
-        <img src="img/product-3.jpg.webp" class="card-img-top" alt="...">
+      <div class="card animate__animated animate__fadeInUp animate__delay-2s">
+        <img src="img/product-3.jpg.webp" class="card-img-top" alt="Piqué Biker shoes">
         <div class="card-body">
           <h5 class="card-title">Piqué Biker shoes</h5>
-          <p class="card-text">$43.48</p>
-          <b class="card-text"><a href="#" class="text-danger">+ add to cart</a></b>
+          <p class="card-text">₹3,299.00</p>
+          <button type="button" class="btn btn-sm btn-outline-danger add-to-cart-btn" data-id="pique-shoes-2" data-name="Piqué Biker shoes" data-price="3299" data-img="img/product-3.jpg.webp">Add to cart</button>
         </div>
       </div>
     </div>
     <div class="card-group m-5 col-lg-11">
-      <div class="card">
-        <img src="img/product-4.jpg" class="card-img-top" alt="...">
+      <div class="card animate__animated animate__fadeInUp animate__delay-1s">
+        <img src="img/product-4.jpg" class="card-img-top" alt="Piqué Biker Jacket">
         <div class="card-body">
           <h5 class="card-title">Piqué Biker Jacket</h5>
-          <p class="card-text">$60.9</p>
-          <b class="card-text"><a href="#" class="text-danger">+ add to cart</a></b>
+          <p class="card-text">₹4,499.00</p>
+          <button type="button" class="btn btn-sm btn-outline-danger add-to-cart-btn" data-id="pique-jacket-2" data-name="Piqué Biker Jacket" data-price="4499" data-img="img/product-4.jpg">Add to cart</button>
         </div>
       </div>
-      <div class="card">
-        <img src="img/product-5.jpg" class="card-img-top" alt="...">
+      <div class="card animate__animated animate__fadeInUp animate__delay-2s">
+        <img src="img/product-5.jpg" class="card-img-top" alt="Piqué t-shirt">
         <div class="card-body">
           <h5 class="card-title">Piqué t-shirt</h5>
-          <p class="card-text">$31.37</p>
-          <b class="card-text"><a href="#" class="text-danger">+ add to cart</a></b>
+          <p class="card-text">₹1,299.00</p>
+          <button type="button" class="btn btn-sm btn-outline-danger add-to-cart-btn" data-id="pique-tshirt" data-name="Piqué t-shirt" data-price="1299" data-img="img/product-5.jpg">Add to cart</button>
         </div>
       </div>
-      <div class="card">
-        <img src="img/product-6.jpg" class="card-img-top" alt="...">
+      <div class="card animate__animated animate__fadeInUp animate__delay-3s">
+        <img src="img/product-6.jpg" class="card-img-top" alt="Piqué">
         <div class="card-body">
           <h5 class="card-title">Piqué</h5>
-          <p class="card-text">$98.49</p>
-          <b class="card-text"><a href="#" class="text-danger">+ add to cart</a></b>
+          <p class="card-text">₹7,999.00</p>
+          <button type="button" class="btn btn-sm btn-outline-danger add-to-cart-btn" data-id="pique-item-6" data-name="Piqué" data-price="7999" data-img="img/product-6.jpg">Add to cart</button>
         </div>
       </div>
     </div>
@@ -253,7 +269,7 @@
             <li><a href="#">Contact Us</a></li>
             <li><a href="#">Payment Methods</a></li>
             <li><a href="#">Delivery</a></li>
-<li><a href="#">Return &amp; Exchanges</a></li>
+            <li><a href="#">Return &amp; Exchanges</a></li>
           </ul>
         </div>
 
@@ -267,6 +283,7 @@
     </footer>
   </div>
   <script src="js/j.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/owl.carousel.min.js"></script>
   <script src="js/wow.min.js"></script>
   <script src="js/bootstrap.bundle.min.js"></script>

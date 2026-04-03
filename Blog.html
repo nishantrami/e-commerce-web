@@ -26,21 +26,17 @@
                 </div>
                 <div class="offcanvas-body justify-content-end">
                     <ul class="navbar-nav justify-content-center flex-grow-1 pe-3">
-                        <li class="nav-item ms-2">
-                            <a class="nav-link" aria-current="page" href="index.html">Home</a>
-                        </li>
-                        <li class="nav-item ms-2">
-                            <a class="nav-link" href="Shop.html">Shop</a>
-                        </li>
-                        <li class="nav-item ms-2">
-                            <a class="nav-link" href="About.html">About us</a>
-                        </li>
-                        <li class="nav-item ms-2">
-                            <a class="nav-link active link-light" href="#">Blog</a>
-                        </li>
-                        <li class="nav-item ms-2">
-                            <a class="nav-link" href="Contact.html">Contact</a>
-                        </li>
+                        <li class="nav-item ms-2"><a class="nav-link" aria-current="page" href="index.html">Home</a></li>
+                        <li class="nav-item ms-2"><a class="nav-link" href="Shop.html">Shop</a></li>
+                        <li class="nav-item ms-2"><a class="nav-link" href="About.html">About us</a></li>
+                        <li class="nav-item ms-2"><a class="nav-link active link-light" href="#">Blog</a></li>
+                        <li class="nav-item ms-2"><a class="nav-link" href="Contact.html">Contact</a></li>
+                        <li class="nav-item guest-item ms-2" id="nav-login" style="display:none;"><a class="nav-link" href="login.html">Login</a></li>
+                        <li class="nav-item guest-item ms-2" id="nav-register" style="display:none;"><a class="nav-link" href="register.html">Register</a></li>
+                        <li class="nav-item auth-item ms-2" id="nav-dashboard" style="display:none;"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+                        <li class="nav-item auth-item ms-2" id="admin-panel-link" style="display:none;"><a class="nav-link" href="dashboard.html#admin-section">Admin Panel</a></li>
+                        <li class="nav-item auth-item ms-2" id="nav-logout" style="display:none;"><a class="nav-link" href="#" id="logout-btn">Logout</a></li>
+                        <li class="nav-item auth-item ms-2" style="display:none;"><a class="nav-link disabled" id="nav-user-name" href="#"></a></li>
                     </ul>
                     <div class="icon">
                         <a href="#"><i class="fa-solid fa-magnifying-glass"></i></a>
@@ -213,10 +209,10 @@
             </div>
         </footer>
     </div>
-</body>
 <script src="js/j.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/owl.carousel.min.js"></script>
 <script src="js/wow.min.js"></script>
 <script src="js/bootstrap.bundle.min.js"></script>
-
+</body>
 </html>
