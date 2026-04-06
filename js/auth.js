@@ -179,8 +179,46 @@ $(document).on('click', '.password-toggle', function() {
   $(this).find('i').toggleClass('fa-eye fa-eye-slash');
 });
 
-// ── LOGIN ──
-$(document).on('submit', '#login-form', function(e) {
+// ── AUTH CONFIG ──
+const ADMIN_CREDENTIALS = {
+  email: 'admin@gmail.com',
+  password: 'admin123',
+  name: 'System Admin',
+  role: 'admin'
+};
+
+// ── CLOUD SYNC HELPERS ──
+const FIREBASE_ACTIVE = typeof firebase !== 'undefined' && firebase.apps.length > 0;
+
+async function syncUserData(user) {
+  if (!FIREBASE_ACTIVE) return;
+  try {
+    const db = firebase.firestore();
+    const userRef = db.collection('users').doc(user.email);
+    
+    // Save/Update user profile in cloud
+    await userRef.set({
+      name: user.name,
+      email: user.email,
+      role: user.role || 'user',
+      lastLogin: new Date().toISOString()
+    }, { merge: true });
+
+    // Sync Orders to Cloud (if any local)
+    const localOrders = JSON.parse(localStorage.getItem('fashion_orders') || '[]');
+    if (localOrders.length > 0) {
+      const ordersRef = userRef.collection('orders');
+      for (const order of localOrders) {
+        await ordersRef.doc(order.id.replace('#', '')).set(order);
+      }
+    }
+  } catch (e) {
+    console.error("Sync error:", e);
+  }
+}
+
+// ── LOGIN HANDLER ──
+$(document).on('submit', '#login-form', async function(e) {
   e.preventDefault();
   const email = $('#login-email').val().trim().toLowerCase();
   const password = $('#login-password').val();
@@ -191,31 +229,63 @@ $(document).on('submit', '#login-form', function(e) {
   btn.find('.spinner-border').removeClass('d-none');
   btn.prop('disabled', true);
 
-  setTimeout(() => {
-    const users = getUsers();
-    const user = users.find(u => u.email === email && u.password === password);
+  // 1. Static Admin Check
+  if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
+    setSession(ADMIN_CREDENTIALS);
+    msgEl.text('Admin login successful!').addClass('text-success');
+    setTimeout(() => window.location.href = 'dashboard.html', 1000);
+    return;
+  }
 
-    if (user) {
-      setSession({ name: user.name, email: user.email, role: user.role });
-      msgEl.text('Login successful! Redirecting...').addClass('text-success animate__shakeX');
-      setTimeout(() => {
-        window.location.href = user.role === 'admin' ? 'dashboard.html' : 'index.html';
-      }, 1500);
-    } else {
-      msgEl.text('Invalid email or password.').addClass('text-danger animate__shakeX');
+  // 2. Cloud Login
+  if (FIREBASE_ACTIVE) {
+    try {
+      const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+      const db = firebase.firestore();
+      
+      // 1. Fetch Profile
+      const doc = await db.collection('users').doc(email).get();
+      const userData = doc.exists ? doc.data() : { name: email.split('@')[0], email, role: 'user' };
+      
+      // 2. Fetch Orders from Cloud and Update LocalStorage
+      const ordersSnap = await db.collection('users').doc(email).collection('orders').get();
+      const cloudOrders = [];
+      ordersSnap.forEach(d => cloudOrders.push(d.data()));
+      
+      if (cloudOrders.length > 0) {
+        localStorage.setItem('fashion_orders', JSON.stringify(cloudOrders));
+      }
+      
+      setSession(userData);
+      msgEl.text('Cloud sync complete! Redirecting...').addClass('text-success');
+      setTimeout(() => window.location.href = 'dashboard.html', 1000);
+    } catch (err) {
+      msgEl.text(err.message).addClass('text-danger');
       btn.find('.spinner-border').addClass('d-none');
       btn.prop('disabled', false);
     }
-  }, 1000);
+  } else {
+    // 3. Local Fallback
+    const users = getUsers();
+    const user = users.find(u => u.email === email && u.password === password);
+    if (user) {
+      setSession(user);
+      msgEl.text('Local login successful!').addClass('text-success');
+      setTimeout(() => window.location.href = 'dashboard.html', 1000);
+    } else {
+      msgEl.text('Invalid credentials.').addClass('text-danger');
+      btn.find('.spinner-border').addClass('d-none');
+      btn.prop('disabled', false);
+    }
+  }
 });
 
-// ── REGISTER ──
-$(document).on('submit', '#register-form', function(e) {
+// ── REGISTER HANDLER ──
+$(document).on('submit', '#register-form', async function(e) {
   e.preventDefault();
   const name = $('#register-name').val().trim();
   const email = $('#register-email').val().trim().toLowerCase();
   const password = $('#register-password').val();
-  const role = $('#register-role').val() || 'user';
   const msgEl = $('#register-message');
   const btn = $(this).find('button[type="submit"]');
 
@@ -223,19 +293,36 @@ $(document).on('submit', '#register-form', function(e) {
   btn.find('.spinner-border').removeClass('d-none');
   btn.prop('disabled', true);
 
-  setTimeout(() => {
-    const users = getUsers();
-    if (users.some(u => u.email === email)) {
-      msgEl.text('Email already registered!').addClass('text-danger animate__shakeX');
+  if (email === 'admin@gmail.com') {
+    msgEl.text('This email is reserved.').addClass('text-danger');
+    btn.find('.spinner-border').addClass('d-none');
+    btn.prop('disabled', false);
+    return;
+  }
+
+  if (FIREBASE_ACTIVE) {
+    try {
+      await firebase.auth().createUserWithEmailAndPassword(email, password);
+      const user = { name, email, role: 'user' };
+      await syncUserData(user);
+      msgEl.text('Account synced to cloud!').addClass('text-success');
+      setTimeout(() => window.location.href = 'login.html', 1500);
+    } catch (err) {
+      msgEl.text(err.message).addClass('text-danger');
       btn.find('.spinner-border').addClass('d-none');
       btn.prop('disabled', false);
-    } else {
-      users.push({ name, email, password, role });
-      saveUsers(users);
-      msgEl.text('Account created! Please login.').addClass('text-success animate__shakeX');
-      setTimeout(() => {
-        window.location.href = 'login.html';
-      }, 2000);
     }
-  }, 1000);
+  } else {
+    const users = getUsers();
+    if (users.find(u => u.email === email)) {
+      msgEl.text('Email already registered!').addClass('text-danger');
+      btn.find('.spinner-border').addClass('d-none');
+      btn.prop('disabled', false);
+      return;
+    }
+    users.push({ name, email, password, role: 'user' });
+    saveUsers(users);
+    msgEl.text('Account created locally.').addClass('text-success');
+    setTimeout(() => window.location.href = 'login.html', 1500);
+  }
 });

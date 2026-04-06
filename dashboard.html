@@ -46,8 +46,9 @@
       flex-direction: column;
       position: fixed;
       top: 0; left: 0;
-      z-index: 100;
-      transition: transform .3s cubic-bezier(.4,0,.2,1);
+      z-index: 1000;
+      transition: transform .4s cubic-bezier(.4, 0, .2, 1);
+      box-shadow: 20px 0 50px rgba(0,0,0,0.5);
     }
     .sidebar.collapsed { transform: translateX(calc(-1 * var(--sidebar-w))); }
     .sidebar-logo {
@@ -327,6 +328,60 @@
     .status-pill.pending   { background: rgba(247,197,159,.15); color: var(--accent4); }
     .status-pill.cancelled { background: rgba(255,101,132,.15); color: var(--accent2); }
 
+    /* ── RESPONSIVE TABLE WRAP ── */
+    .table-responsive { 
+      width: 100%; 
+      overflow-x: auto; 
+      -webkit-overflow-scrolling: touch; 
+      position: relative;
+    }
+    
+    @media (max-width: 600px) {
+      /* Transform table to cards */
+      .dash-table, .dash-table thead, .dash-table tbody, .dash-table th, .dash-table td, .dash-table tr { 
+        display: block; 
+      }
+      .dash-table thead tr { 
+        position: absolute; top: -9999px; left: -9999px; 
+      }
+      .dash-table tr { 
+        border-bottom: 1px solid var(--card-border); 
+        padding: 12px 16px;
+      }
+      .dash-table td { 
+        border: none;
+        position: relative;
+        padding-left: 50% !important; 
+        text-align: right;
+        padding: 8px 0 !important;
+      }
+      .dash-table td::before { 
+        content: attr(data-label);
+        position: absolute; left: 0; width: 45%; 
+        padding-right: 10px; white-space: nowrap; 
+        text-align: left; font-weight: 600; font-size: 11px;
+        color: var(--text-dim); text-transform: uppercase;
+      }
+      .table-responsive::after { display: none; }
+    }
+
+    @media (min-width: 601px) and (max-width: 1024px) {
+      .dash-table { min-width: 750px; }
+      .dash-table th, .dash-table td { white-space: nowrap; }
+      .table-responsive::after {
+        content: 'Scroll →';
+        position: absolute; right: 10px; top: 10px;
+        font-size: 9px; color: var(--accent);
+        background: rgba(108,99,255,0.1);
+        padding: 2px 6px; border-radius: 4px;
+        pointer-events: none;
+      }
+    }
+
+    .table-responsive::-webkit-scrollbar { height: 6px; display: block; }
+    .table-responsive::-webkit-scrollbar-thumb { background: rgba(108,99,255,.2); border-radius: 10px; }
+    .table-responsive::-webkit-scrollbar-track { background: rgba(255,255,255,.02); }
+
     /* ── ACTIVITY ── */
     .activity-card {
       background: var(--card);
@@ -348,7 +403,7 @@
     /* ── ADMIN PANEL ── */
     .admin-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 16px;
       margin-bottom: 28px;
     }
@@ -446,18 +501,37 @@
     .overlay.show { display: block; }
 
     /* ── MOBILE ── */
-    @media (max-width: 768px) {
+    @media (max-width: 1024px) {
       .sidebar { transform: translateX(calc(-1 * var(--sidebar-w))); }
       .sidebar.open { transform: translateX(0); }
       .main { margin-left: 0 !important; }
-      .charts-row, .bottom-row { grid-template-columns: 1fr; }
       .stats-grid { grid-template-columns: 1fr 1fr; }
+      .charts-row, .bottom-row { grid-template-columns: 1fr; }
+      .topbar { padding: 0 16px; }
+    }
+    @media (max-width: 768px) {
       .profile-grid { grid-template-columns: 1fr; }
-      .greeting { flex-direction: column; text-align: center; }
+      .greeting { flex-direction: column; text-align: center; padding: 24px 20px; }
+      .greeting-icon { display: none; }
+      .topbar-title { font-size: 18px; }
+    }
+    @media (max-width: 600px) {
+      .search-bar { display: none; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .section-header, .table-card-header { flex-direction: column; align-items: flex-start !important; gap: 12px; padding: 16px !important; }
+      .section-header input, .table-card-header input { width: 100% !important; margin: 0 !important; }
+      .admin-grid { grid-template-columns: 1fr; gap: 12px; }
+      .admin-card { display: flex; align-items: center; text-align: left; gap: 16px; padding: 12px 16px; }
+      .admin-card i { margin-bottom: 0; font-size: 20px; }
+      .admin-card h4 { font-size: 13px; }
+      .admin-card p { display: none; }
     }
     @media (max-width: 480px) {
-      .stats-grid { grid-template-columns: 1fr; }
-      .content { padding: 16px; }
+      .content { padding: 12px; }
+      .topbar-title { font-size: 15px; font-weight: 800; }
+      .greeting h1 { font-size: 20px; }
+      .stat-value { font-size: 24px; }
+      .notif-panel { width: calc(100vw - 32px); right: 16px; }
     }
 
     /* ── TOAST ── */
@@ -510,8 +584,8 @@
     .modal-overlay.open { display: grid; }
     .modal-box {
       background: var(--bg2); border: 1px solid var(--card-border);
-      border-radius: var(--radius); padding: 28px;
-      max-width: 460px; width: 90%;
+      border-radius: var(--radius); padding: 24px;
+      max-width: 460px; width: 92%;
       box-shadow: 0 20px 60px rgba(0,0,0,.5);
       animation: fadeUp .25s ease;
     }
@@ -695,22 +769,24 @@
             <h3>Recent Orders</h3>
             <span class="view-all" onclick="switchSection('orders', document.querySelector('[data-section=orders]'))">View All →</span>
           </div>
-          <table class="dash-table">
-            <thead>
-              <tr>
-                <th>Order</th>
-                <th>Product</th>
-                <th>Status</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>#1042</td><td>Leather Jacket</td><td><span class="status-pill delivered">Delivered</span></td><td>₹128</td></tr>
-              <tr><td>#1038</td><td>Summer Dress</td><td><span class="status-pill pending">Pending</span></td><td>₹64</td></tr>
-              <tr><td>#1031</td><td>Sneakers Pro</td><td><span class="status-pill delivered">Delivered</span></td><td>₹99</td></tr>
-              <tr><td>#1024</td><td>Denim Shorts</td><td><span class="status-pill cancelled">Cancelled</span></td><td>₹42</td></tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th data-label="Order">Order</th>
+                  <th data-label="Product">Product</th>
+                  <th data-label="Status">Status</th>
+                  <th data-label="Amount">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td data-label="Order">#1042</td><td data-label="Product">Leather Jacket</td><td data-label="Status"><span class="status-pill delivered">Delivered</span></td><td data-label="Amount">₹128</td></tr>
+                <tr><td data-label="Order">#1038</td><td data-label="Product">Summer Dress</td><td data-label="Status"><span class="status-pill pending">Pending</span></td><td data-label="Amount">₹64</td></tr>
+                <tr><td data-label="Order">#1031</td><td data-label="Product">Sneakers Pro</td><td data-label="Status"><span class="status-pill delivered">Delivered</span></td><td data-label="Amount">₹99</td></tr>
+                <tr><td data-label="Order">#1024</td><td data-label="Product">Denim Shorts</td><td data-label="Status"><span class="status-pill cancelled">Cancelled</span></td><td data-label="Amount">₹42</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div class="activity-card">
@@ -753,19 +829,21 @@
 
       <div class="table-card" style="margin-bottom:20px">
         <div class="table-card-header"><h3>All Orders</h3></div>
-        <table class="dash-table">
-          <thead>
-            <tr><th>Order ID</th><th>Product</th><th>Date</th><th>Status</th><th>Amount</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>#1042</td><td>Leather Jacket</td><td>Mar 30 2026</td><td><span class="status-pill delivered">Delivered</span></td><td>₹128.00</td></tr>
-            <tr><td>#1038</td><td>Summer Dress</td><td>Mar 25 2026</td><td><span class="status-pill pending">Pending</span></td><td>₹64.00</td></tr>
-            <tr><td>#1031</td><td>Sneakers Pro</td><td>Mar 18 2026</td><td><span class="status-pill delivered">Delivered</span></td><td>₹99.00</td></tr>
-            <tr><td>#1024</td><td>Denim Shorts</td><td>Mar 10 2026</td><td><span class="status-pill cancelled">Cancelled</span></td><td>₹42.00</td></tr>
-            <tr><td>#1015</td><td>Premium Hoodie</td><td>Feb 28 2026</td><td><span class="status-pill delivered">Delivered</span></td><td>₹85.00</td></tr>
-            <tr><td>#1008</td><td>Floral Blouse</td><td>Feb 14 2026</td><td><span class="status-pill delivered">Delivered</span></td><td>₹55.00</td></tr>
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="dash-table">
+            <thead>
+              <tr><th data-label="Order ID">Order ID</th><th data-label="Product">Product</th><th data-label="Date">Date</th><th data-label="Status">Status</th><th data-label="Amount">Amount</th></tr>
+            </thead>
+            <tbody>
+              <tr><td data-label="Order ID">#1042</td><td data-label="Product">Leather Jacket</td><td data-label="Date">Mar 30 2026</td><td data-label="Status"><span class="status-pill delivered">Delivered</span></td><td data-label="Amount">₹128.00</td></tr>
+              <tr><td data-label="Order ID">#1038</td><td data-label="Product">Summer Dress</td><td data-label="Date">Mar 25 2026</td><td data-label="Status"><span class="status-pill pending">Pending</span></td><td data-label="Amount">₹64.00</td></tr>
+              <tr><td data-label="Order ID">#1031</td><td data-label="Product">Sneakers Pro</td><td data-label="Date">Mar 18 2026</td><td data-label="Status"><span class="status-pill delivered">Delivered</span></td><td data-label="Amount">₹99.00</td></tr>
+              <tr><td data-label="Order ID">#1024</td><td data-label="Product">Denim Shorts</td><td data-label="Date">Mar 10 2026</td><td data-label="Status"><span class="status-pill cancelled">Cancelled</span></td><td data-label="Amount">₹42.00</td></tr>
+              <tr><td data-label="Order ID">#1015</td><td data-label="Product">Premium Hoodie</td><td data-label="Date">Feb 28 2026</td><td data-label="Status"><span class="status-pill delivered">Delivered</span></td><td data-label="Amount">₹85.00</td></tr>
+              <tr><td data-label="Order ID">#1008</td><td data-label="Product">Floral Blouse</td><td data-label="Date">Feb 14 2026</td><td data-label="Status"><span class="status-pill delivered">Delivered</span></td><td data-label="Amount">₹55.00</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="chart-card">
@@ -936,25 +1014,29 @@
           <span>Registered Users</span>
           <input type="text" id="admin-user-search" placeholder="Search users…" oninput="filterAdminUsers()" style="background:var(--bg);border:1px solid var(--card-border);color:var(--text);padding:6px 12px;border-radius:8px;font-family:inherit;font-size:12px;outline:none;width:180px" />
         </div>
-        <table class="dash-table">
-          <thead>
-            <tr><th>#</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Action</th></tr>
-          </thead>
-          <tbody id="admin-users-tbody">
-            <tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:24px">Loading users…</td></tr>
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="dash-table">
+            <thead>
+              <tr><th data-label="#">#</th><th data-label="Name">Name</th><th data-label="Email">Email</th><th data-label="Role">Role</th><th data-label="Status">Status</th><th data-label="Action">Action</th></tr>
+            </thead>
+            <tbody id="admin-users-tbody">
+              <tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:24px">Loading users…</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- Admin Orders Tracking -->
       <div class="table-card" id="admin-orders-section" style="margin-bottom:20px">
         <div class="table-card-header"><h3>Order Tracking</h3></div>
-        <table class="dash-table">
-          <thead><tr><th>Order</th><th>Customer</th><th>Product</th><th>Status</th><th>Action</th></tr></thead>
-          <tbody id="admin-orders-tbody">
-            <tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:24px">Loading orders…</td></tr>
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="dash-table">
+            <thead><tr><th data-label="Order">Order</th><th data-label="Customer">Customer</th><th data-label="Product">Product</th><th data-label="Status">Status</th><th data-label="Action">Action</th></tr></thead>
+            <tbody id="admin-orders-tbody">
+              <tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:24px">Loading orders…</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="chart-card" id="admin-chart-section">
@@ -1018,6 +1100,28 @@
 <!-- TOAST -->
 <div class="toast-alert" id="dash-toast"></div>
 
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+// Firebase Config Placeholder (User needs to provide real keys)
+const firebaseConfig = {
+  apiKey: "REPLACE_WITH_YOUR_API_KEY",
+  authDomain: "REPLACE_WITH_YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "REPLACE_WITH_YOUR_PROJECT_ID",
+  storageBucket: "REPLACE_WITH_YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "REPLACE_WITH_YOUR_SENDER_ID",
+  appId: "REPLACE_WITH_YOUR_APP_ID"
+};
+
+// Initialize Firebase
+if (firebaseConfig.apiKey !== "REPLACE_WITH_YOUR_API_KEY") {
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+}
+</script>
+
 <script src="js/j.js"></script>
 <script src="js/bootstrap.bundle.min.js"></script>
 <script>
@@ -1078,7 +1182,7 @@ const overlayEl = document.getElementById('overlay');
 let sbOpen = true;
 
 function toggleSidebar(){
-  const mobile = window.innerWidth <= 768;
+  const mobile = window.innerWidth <= 1024;
   if(mobile){
     sidebar.classList.toggle('open');
     overlayEl.classList.toggle('show');
@@ -1379,11 +1483,11 @@ function renderOrdersTable(){
   if(!tbody) return;
   tbody.innerHTML = orders.map(o=>`
     <tr>
-      <td>${o.id}</td>
-      <td>${o.product}</td>
-      <td>${o.date}</td>
-      <td><span class="status-pill ${o.status}">${o.status.charAt(0).toUpperCase()+o.status.slice(1)}</span></td>
-      <td>₹${o.amount.toFixed(2)}</td>
+      <td data-label="Order">${o.id}</td>
+      <td data-label="Product">${o.product}</td>
+      <td data-label="Date">${o.date}</td>
+      <td data-label="Status"><span class="status-pill ${o.status}">${o.status.charAt(0).toUpperCase()+o.status.slice(1)}</span></td>
+      <td data-label="Amount">₹${o.amount.toFixed(2)}</td>
     </tr>
   `).join('');
   // update badge
@@ -1480,17 +1584,16 @@ function renderOverviewOrders(){
   if(user && user.role !== 'admin'){
     orders = orders.filter(o => o.customer === user.name || o.customer === 'Guest');
   }
-  // Latest first
   orders = orders.slice().sort((a,b) => parseInt(b.id.replace('#','')) - parseInt(a.id.replace('#','')));
 
   const tbody = document.querySelector('#sec-overview .dash-table tbody');
   if(!tbody) return;
   tbody.innerHTML = orders.slice(0,4).map(o=>`
     <tr>
-      <td>${o.id}</td>
-      <td>${o.product}</td>
-      <td><span class="status-pill ${o.status}">${o.status.charAt(0).toUpperCase()+o.status.slice(1)}</span></td>
-      <td>₹${o.amount}</td>
+      <td data-label="ID">${o.id}</td>
+      <td data-label="Product">${o.product}</td>
+      <td data-label="Status"><span class="status-pill ${o.status}">${o.status.charAt(0).toUpperCase()+o.status.slice(1)}</span></td>
+      <td data-label="Amount">₹${o.amount}</td>
     </tr>
   `).join('');
 }
@@ -1511,12 +1614,12 @@ function loadAdminUsers(){
   tbody.innerHTML = users.map((u,i)=>{
     const isSelf = u.email === currentUser.email;
     return `<tr>
-      <td>${i+1}</td>
-      <td><b>${u.name}</b>${isSelf?' <span style="font-size:10px;color:var(--accent)">(you)</span>':''}</td>
-      <td>${u.email}</td>
-      <td><span class="role-badge ${u.role==='admin'?'admin':'user'}" style="cursor:pointer" onclick="toggleRole('${u.email}')">${u.role||'user'} <i class="fa-solid fa-repeat" style="font-size:8px;margin-left:2px"></i></span></td>
-      <td><span class="status-pill delivered">Active</span></td>
-      <td>${isSelf?'—':'<button class="action-btn danger" onclick="deleteUser(\''+u.email+'\')"><i class="fa-solid fa-trash"></i></button>'}</td>
+      <td data-label="#">${i+1}</td>
+      <td data-label="Name"><b>${u.name}</b>${isSelf?' <span style="font-size:10px;color:var(--accent)">(you)</span>':''}</td>
+      <td data-label="Email">${u.email}</td>
+      <td data-label="Role"><span class="role-badge ${u.role==='admin'?'admin':'user'}" style="cursor:pointer" onclick="toggleRole('${u.email}')">${u.role||'user'} <i class="fa-solid fa-repeat" style="font-size:8px;margin-left:2px"></i></span></td>
+      <td data-label="Status"><span class="status-pill delivered">Active</span></td>
+      <td data-label="Action">${isSelf?'—':'<button class="action-btn danger" onclick="deleteUser(\''+u.email+'\')"><i class="fa-solid fa-trash"></i></button>'}</td>
     </tr>`;
   }).join('');
 
@@ -1551,12 +1654,12 @@ function loadAdminOrders(){
 
   tbody.innerHTML = orders.slice().sort((a,b) => parseInt(b.id.replace('#','')) - parseInt(a.id.replace('#',''))).map(o=>`
     <tr>
-      <td><b>${o.id}</b></td>
-      <td>${o.customer}</td>
-      <td>${o.product}</td>
-      <td><span class="status-pill ${o.status}">${o.status.charAt(0).toUpperCase()+o.status.slice(1)}</span></td>
-      <td>
-        <div style="display:flex;gap:6px">
+      <td data-label="Order"><b>${o.id}</b></td>
+      <td data-label="Customer">${o.customer}</td>
+      <td data-label="Product">${o.product}</td>
+      <td data-label="Status"><span class="status-pill ${o.status}">${o.status.charAt(0).toUpperCase()+o.status.slice(1)}</span></td>
+      <td data-label="Action">
+        <div style="display:flex;gap:6px;justify-content:flex-end">
           ${o.status === 'pending' 
              ? `<button class="action-btn" style="color:var(--accent3)" onclick="markDelivered('${o.id.replace('#','')}')" title="Mark Shipped"><i class="fa-solid fa-check"></i></button>`
              : `<button class="action-btn" style="color:var(--text-dim)" disabled><i class="fa-solid fa-eye"></i></button>`

@@ -1,0 +1,18 @@
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project-specific
+.gemini/
+brain/
+tmp/
+node_modules/
+dist/
+build/
+.env
