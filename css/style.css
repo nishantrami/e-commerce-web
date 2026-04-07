@@ -1106,3 +1106,66 @@ body {
   color: red;
 }
 /*Footer section end*/
+
+/* Responsive Slider Styles */
+@media (max-width: 768px) {
+    .carousel-inner img {
+        height: 300px; /* Reduced height for mobile */
+        object-fit: cover;
+    }
+
+    .carousel-item .text-start, 
+    .carousel-item .text {
+        top: 15% !important;
+        padding-left: 20px !important;
+        width: 90%;
+    }
+
+    .carousel-item h2 {
+        font-size: 1.5rem !important;
+        line-height: 1.2;
+    }
+
+    .carousel-item h4 {
+        font-size: 0.9rem !important;
+        padding-bottom: 15px !important;
+        br {
+            display: none; /* Hide line breaks in text for better flow on small screens */
+        }
+    }
+
+    .carousel-item p {
+        font-size: 0.8rem !important;
+        margin-bottom: 5px;
+    }
+
+    .carousel-item .text-start a,
+    .carousel-item .text a {
+        font-size: 1rem !important;
+        padding: 5px 15px !important;
+        border-radius: 5px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-inner img {
+        height: 250px;
+    }
+    
+    .carousel-item .text-start, 
+    .carousel-item .text {
+        top: 10% !important;
+    }
+
+    .carousel-item h2 {
+        font-size: 1.2rem !important;
+    }
+
+    .carousel-item h4 {
+        font-size: 0.8rem !important;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+}
